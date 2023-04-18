@@ -1,34 +1,60 @@
 import throttle from "lodash.throttle";
 
 const feedbackForm = document.querySelector('.feedback-form');
+const formEmail = document.querySelector('input');
+const formMessage = document.querySelector('textarea');
 const STORAGE_KEY = "feedback-form-state";
-const formInput = {};
-savedItems();
+const formInput = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+if (formInput) {
+    formEmail.value = formInput.email;
+    formMessage.value = formInput.message;
+};
+ 
+// savedItems();
 
 feedbackForm.addEventListener('input', throttle(onInput), 500);
 feedbackForm.addEventListener('submit', onSubmit);
 
 function onInput(event) { 
     event.preventDefault();
-    formInput[event.target.name] = event.target.value;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(formInput));
+    const inputData = {
+      email: formEmail.value,
+      message: formMessage.value,
+  };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(inputData));
 };
 
 function onSubmit(event) { 
     event.preventDefault();
-    event.currentTarget.reset();
-    localStorage.removeItem(STORAGE_KEY);
-}
-
-function savedItems() {
+    
     const reloadedSave = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (reloadedSave) {
+    
+    if (feedbackForm.email.value && feedbackForm.message.value) {
         const { email, message } = reloadedSave;
-        feedbackForm.email.value = email;
-        feedbackForm.message.value = message;
+        formEmail.value = email;
+        formMessage.value = message;
         console.log(reloadedSave);
+        event.currentTarget.reset();
+        localStorage.removeItem(STORAGE_KEY);
+    } else {
+        alert('Please, fill in all the forms!');
     };
 }
+
+
+// function savedItems() {
+//     const reloadedSave = JSON.parse(localStorage.getItem(STORAGE_KEY));
+//     if (reloadedSave) {
+//         const { email, message } = reloadedSave;
+//         feedbackForm.email.value = email;
+//         feedbackForm.message.value = message;
+//         console.log(reloadedSave);
+//     };
+// }
+
+
+
 // В HTML есть разметка формы. Напиши скрипт который будет сохранять значения полей в локальное хранилище когда пользователь что-то печатает.
 
 // <form class="feedback-form" autocomplete="off">
